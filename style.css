@@ -1,0 +1,365 @@
+* {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+}
+
+body {
+    background: #07111f;
+    color: #eafcff;
+    font-family: "Fira Code", monospace;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.app {
+    width: min(900px, 100%);
+    height: 100vh;
+
+    padding: 35px 60px;
+
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+
+    gap: 14px;
+}
+
+/* TITLE */
+
+.title {
+    color: #ffffff;
+
+    font-family: "Segoe UI", sans-serif;
+    font-size: 27px;
+    font-weight: 300;
+
+    letter-spacing: 3px;
+
+    text-align: center;
+
+    padding-bottom: 4px;
+}
+
+/* RING */
+
+.ring-container {
+    height: 180px;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.status-ring {
+    position: relative;
+
+    width: 140px;
+    height: 140px;
+
+    border: 2px solid rgba(
+        141,
+        239,
+        255,
+        0.59
+    );
+
+    border-radius: 50%;
+
+    animation:
+        ring-rotate 3s linear infinite;
+}
+
+.ring-inner {
+    position: absolute;
+
+    width: 90px;
+    height: 90px;
+
+    left: 50%;
+    top: 50%;
+
+    transform:
+        translate(-50%, -50%);
+
+    border: 1px solid rgba(
+        141,
+        239,
+        255,
+        0.22
+    );
+
+    border-radius: 50%;
+}
+
+.ring-scope {
+    position: absolute;
+
+    width: 2px;
+    height: 62px;
+
+    background: rgba(
+        141,
+        239,
+        255,
+        0.59
+    );
+
+    left: 50%;
+    top: 8px;
+
+    transform-origin:
+        50% 62px;
+}
+
+.ring-point {
+    position: absolute;
+
+    width: 3px;
+    height: 3px;
+
+    background: rgba(
+        255,
+        255,
+        255,
+        0.86
+    );
+
+    border-radius: 50%;
+
+    left: 50%;
+    top: 50%;
+
+    transform:
+        translate(-50%, -50%);
+}
+
+/* STATUS */
+
+.status {
+    color: #8defff;
+
+    font-family: "Fira Code", monospace;
+    font-size: 12px;
+
+    letter-spacing: 3px;
+
+    text-align: center;
+}
+
+/* CONVERSATION */
+
+.conversation {
+    flex: 1;
+
+    min-height: 0;
+
+    overflow-y: auto;
+
+    background: #081522;
+
+    border: 1px solid #17364a;
+
+    padding: 18px 24px;
+
+    font-family: "Fira Code", monospace;
+    font-size: 13px;
+
+    scrollbar-width: none;
+}
+
+.conversation::-webkit-scrollbar {
+    display: none;
+}
+
+/* MESSAGES */
+
+.message {
+    margin-top: 18px;
+    margin-bottom: 18px;
+
+    word-wrap: break-word;
+}
+
+.message.user {
+    text-align: right;
+}
+
+.message.lucy {
+    text-align: left;
+}
+
+.message-text {
+    display: block;
+}
+
+.message.user .message-text {
+    color: #8defff;
+}
+
+.message.lucy .message-text {
+    color: #ffffff;
+}
+
+.timestamp {
+    display: block;
+
+    color: #52636d;
+
+    font-size: 10px;
+
+    margin-top: 3px;
+}
+
+/* PROCESSING */
+
+.processing {
+    color: #8defff;
+
+    font-size: 10px;
+
+    padding-left: 24px;
+    padding-top: 2px;
+}
+
+.hidden {
+    display: none;
+}
+
+/* INPUT */
+
+#chat-form {
+    display: flex;
+
+    gap: 12px;
+}
+
+#text-input {
+    flex: 1;
+
+    min-width: 0;
+
+    height: 44px;
+
+    background: #081522;
+
+    color: #eafcff;
+
+    border: 1px solid #23445a;
+
+    padding: 10px 14px;
+
+    font-family: "Fira Code", monospace;
+    font-size: 14px;
+
+    outline: none;
+}
+
+#text-input:focus {
+    border: 1px solid #8defff;
+}
+
+#text-input:disabled {
+    color: #52636d;
+
+    border-color: #17364a;
+}
+
+#send-button {
+    height: 44px;
+
+    background: transparent;
+
+    color: #8defff;
+
+    border: 1px solid #8defff;
+
+    padding: 9px 28px;
+
+    font-family: "Fira Code", monospace;
+    font-size: 12px;
+
+    letter-spacing: 2px;
+
+    cursor: pointer;
+}
+
+#send-button:hover {
+    background: #102b3a;
+
+    color: #ffffff;
+
+    border-color: #ffffff;
+}
+
+#send-button:active {
+    background: #8defff;
+
+    color: #07111f;
+}
+
+#send-button:disabled {
+    color: #52636d;
+
+    border-color: #17364a;
+
+    cursor: default;
+}
+
+/* RING ANIMATION */
+
+@keyframes ring-rotate {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* PHONE */
+
+@media (max-width: 600px) {
+
+    .app {
+        height: 100dvh;
+
+        padding: 25px 18px;
+
+        gap: 12px;
+    }
+
+    .title {
+        font-size: 23px;
+    }
+
+    .ring-container {
+        height: 150px;
+    }
+
+    .status-ring {
+        width: 120px;
+        height: 120px;
+    }
+
+    .conversation {
+        padding: 14px 16px;
+    }
+
+    #chat-form {
+        gap: 8px;
+    }
+
+    #send-button {
+        padding: 9px 16px;
+    }
+
+}
