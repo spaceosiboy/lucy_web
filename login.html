@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+>
+
+<title>Lucy</title>
+
+<link
+    rel="preconnect"
+    href="https://fonts.googleapis.com"
+>
+
+<link
+    rel="preconnect"
+    href="https://fonts.gstatic.com"
+    crossorigin
+>
+
+<link
+    href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&display=swap"
+    rel="stylesheet"
+>
+
+<style>
+    * {
+        box-sizing: border-box;
+    }
+
+    html,
+    body {
+        width: 100%;
+        height: 100%;
+        margin: 0;
+    }
+
+    body {
+        background: #0a1220;
+        color: #ffffff;
+        font-family: "Fira Code", monospace;
+
+        display: flex;
+        justify-content: center;
+        align-items: center;
+
+        overflow: hidden;
+    }
+
+    .login {
+        width: 100%;
+        max-width: 700px;
+
+        display: flex;
+        flex-direction: column;
+
+        align-items: center;
+
+        text-align: center;
+
+        transition:
+            opacity 0.8s ease;
+    }
+
+    .status-line {
+        font-size: 14px;
+
+        letter-spacing: 0.3em;
+
+        line-height: 2.5;
+
+        color: rgba(
+            255,
+            255,
+            255,
+            0.55
+        );
+
+        white-space: nowrap;
+    }
+
+    .input-line {
+        font-size: 18px;
+
+        line-height: 2.5;
+
+        color: #ffffff;
+
+        white-space: nowrap;
+    }
+
+    .jack-input {
+        width: 125px;
+
+        background: transparent;
+
+        border: none;
+
+        outline: none;
+
+        color: #ffffff;
+
+        font-family: "Fira Code", monospace;
+
+        font-size: 18px;
+
+        line-height: 1;
+
+        padding: 0;
+
+        caret-color: #00e5ff;
+    }
+
+    .connect {
+        margin-top: 8px;
+
+        padding: 6px 18px;
+
+        background: transparent;
+
+        color: #ffffff;
+
+        border: 1px solid #00e5ff;
+
+        font-family: "Fira Code", monospace;
+
+        font-size: 16px;
+
+        line-height: 2.5;
+
+        cursor: pointer;
+
+        opacity: 0;
+
+        pointer-events: none;
+
+        transform: translateY(-4px);
+
+        transition:
+            opacity 0.25s ease,
+            transform 0.25s ease,
+            box-shadow 0.25s ease;
+    }
+
+    .connect.visible {
+        opacity: 1;
+
+        pointer-events: auto;
+
+        transform: translateY(0);
+    }
+
+    .connect:hover {
+        box-shadow:
+            0 0 14px rgba(
+                0,
+                229,
+                255,
+                0.35
+            );
+    }
+
+    .connect.snap {
+        transform: scale(0.94);
+
+        box-shadow:
+            0 0 18px rgba(
+                0,
+                229,
+                255,
+                0.45
+            );
+    }
+
+    .black-frame {
+        position: fixed;
+
+        inset: 0;
+
+        background: #000000;
+
+        opacity: 0;
+
+        pointer-events: none;
+
+        z-index: 10;
+
+        transition:
+            opacity 0.8s ease;
+    }
+
+    .black-frame.active {
+        opacity: 1;
+    }
+
+    .jack-circle {
+        position: fixed;
+
+        left: 50%;
+        top: 42%;
+
+        width: 140px;
+        height: 140px;
+
+        transform:
+            translate(-50%, -50%)
+            scale(0.15);
+
+        border: 2px solid rgba(
+            255,
+            255,
+            255,
+            0.9
+        );
+
+        border-radius: 50%;
+
+        opacity: 0;
+
+        z-index: 11;
+
+        pointer-events: none;
+    }
+
+    .jack-circle::before {
+        content: "";
+
+        position: absolute;
+
+        width: 90px;
+        height: 90px;
+
+        left: 50%;
+        top: 50%;
+
+        transform:
+            translate(-50%, -50%);
+
+        border: 1px solid #00e5ff;
+
+        border-radius: 50%;
+    }
+
+    .jack-circle::after {
+        content: "";
+
+        position: absolute;
+
+        width: 2px;
+        height: 62px;
+
+        background: #00e5ff;
+
+        left: 50%;
+        top: 8px;
+
+        transform-origin:
+            50% 62px;
+    }
+
+    .jack-circle.transmitting {
+        opacity: 1;
+
+        animation:
+            jack-spin 0.45s linear infinite;
+
+        box-shadow:
+            0 0 45px rgba(
+                0,
+                229,
+                255,
+                0.18
+            );
+    }
+
+    .jack-message {
+        position: fixed;
+
+        left: 50%;
+        top: calc(42% + 105px);
+
+        transform:
+            translateX(-50%);
+
+        color: #ffffff;
+
+        font-family: "Fira Code", monospace;
+
+        font-size: 18px;
+
+        opacity: 0;
+
+        z-index: 12;
+
+        pointer-events: none;
+
+        white-space: nowrap;
+
+        transition:
+            opacity 0.45s ease;
+    }
+
+    .jack-message.visible {
+        opacity: 1;
+    }
+
+    .login.hidden {
+        opacity: 0;
+    }
+
+    @keyframes jack-spin {
+        from {
+            transform:
+                translate(-50%, -50%)
+                scale(1)
+                rotate(0deg);
+        }
+
+        to {
+            transform:
+                translate(-50%, -50%)
+                scale(1)
+                rotate(360deg);
+        }
+    }
+
+    body.jacking {
+        background: #000000;
+    }
+
+    @media (max-width: 600px) {
+
+        .status-line {
+            font-size: 11px;
+
+            letter-spacing: 0.2em;
+        }
+
+        .input-line {
+            font-size: 16px;
+        }
+
+        .jack-input {
+            font-size: 16px;
+        }
+
+        .connect {
+            font-size: 14px;
+        }
+
+        .jack-message {
+            font-size: 16px;
+        }
+
+    }
+</style>
+
+</head>
+
+<body>
+
+<main
+    class="login"
+    id="login"
+>
+
+    <div class="status-line">
+        LUCY_KUSHINADA // STATUS: OFFLINE
+    </div>
+
+    <div class="input-line">
+        &gt; JACK_IN[<input
+            id="jack-input"
+            class="jack-input"
+            type="text"
+            autocomplete="off"
+            spellcheck="false"
+        >]
+    </div>
+
+    <button
+        id="connect"
+        class="connect"
+        type="button"
+    >
+        [ CONNECT ]
+    </button>
+
+</main>
+
+<div
+    id="black-frame"
+    class="black-frame"
+></div>
+
+<div
+    id="jack-circle"
+    class="jack-circle"
+></div>
+
+<div
+    id="jack-message"
+    class="jack-message"
+>
+    Took you long enough.
+</div>
+
+<script>
+    const input =
+        document.getElementById("jack-input");
+
+    const connect =
+        document.getElementById("connect");
+
+    const login =
+        document.getElementById("login");
+
+    const blackFrame =
+        document.getElementById("black-frame");
+
+    const circle =
+        document.getElementById("jack-circle");
+
+    const message =
+        document.getElementById("jack-message");
+
+
+    const API_URL =
+        "https://lucy-cloud.onrender.com";
+
+
+    function updateConnect() {
+
+        if (input.value.length > 0) {
+
+            connect.classList.add(
+                "visible"
+            );
+
+        } else {
+
+            connect.classList.remove(
+                "visible"
+            );
+
+        }
+    }
+
+
+    async function jackIn() {
+
+        const key =
+            input.value.trim();
+
+        if (!key) {
+            return;
+        }
+
+        connect.disabled = true;
+
+        input.disabled = true;
+
+        connect.classList.add(
+            "snap"
+        );
+
+
+        try {
+
+            const response =
+                await fetch(
+                    `${API_URL}/login`,
+                    {
+                        method: "POST",
+
+                        headers: {
+                            "Content-Type":
+                                "application/json"
+                        },
+
+                        body: JSON.stringify({
+                            key: key
+                        })
+                    }
+                );
+
+
+            if (!response.ok) {
+
+                let errorMessage =
+                    "ACCESS DENIED";
+
+                try {
+
+                    const data =
+                        await response.json();
+
+                    if (data.detail) {
+                        errorMessage =
+                            data.detail;
+                    }
+
+                } catch {
+                    // Keep default error.
+                }
+
+
+                connect.disabled = false;
+
+                input.disabled = false;
+
+                connect.classList.remove(
+                    "snap"
+                );
+
+                input.select();
+
+                alert(
+                    errorMessage
+                );
+
+                return;
+            }
+
+
+            const data =
+                await response.json();
+
+
+            if (!data.token) {
+
+                throw new Error(
+                    "Authentication token missing."
+                );
+            }
+
+
+            sessionStorage.setItem(
+                "lucy_token",
+                data.token
+            );
+
+
+            // ----------------------------------
+            // SUCCESSFUL JACK-IN
+            // ----------------------------------
+
+            login.classList.add(
+                "hidden"
+            );
+
+            document.body.classList.add(
+                "jacking"
+            );
+
+            blackFrame.classList.add(
+                "active"
+            );
+
+
+            setTimeout(
+                function() {
+
+                    circle.classList.add(
+                        "transmitting"
+                    );
+
+                },
+                800
+            );
+
+
+            setTimeout(
+                function() {
+
+                    message.classList.add(
+                        "visible"
+                    );
+
+                },
+                1400
+            );
+
+
+            setTimeout(
+                function() {
+
+                    window.location.href =
+                        "index.html";
+
+                },
+                2200
+            );
+
+
+        } catch (error) {
+
+            console.error(
+                "Lucy login error:",
+                error
+            );
+
+
+            connect.disabled = false;
+
+            input.disabled = false;
+
+            connect.classList.remove(
+                "snap"
+            );
+
+
+            alert(
+                "SYSTEM ERROR"
+            );
+
+        }
+    }
+
+
+    input.addEventListener(
+        "input",
+        updateConnect
+    );
+
+
+    input.addEventListener(
+        "keydown",
+        function(event) {
+
+            if (
+                event.key === "Enter"
+            ) {
+
+                event.preventDefault();
+
+                jackIn();
+
+            }
+
+        }
+    );
+
+
+    connect.addEventListener(
+        "click",
+        jackIn
+    );
+
+
+    window.addEventListener(
+        "load",
+        function() {
+
+            input.focus();
+
+        }
+    );
+</script>
+
+</body>
+</html>

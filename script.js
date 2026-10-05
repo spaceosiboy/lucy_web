@@ -1,6 +1,11 @@
-const form = document.getElementById("chat-form");
-const input = document.getElementById("text-input");
-const sendButton = document.getElementById("send-button");
+const form =
+    document.getElementById("chat-form");
+
+const input =
+    document.getElementById("text-input");
+
+const sendButton =
+    document.getElementById("send-button");
 
 const conversation =
     document.getElementById("conversation");
@@ -22,8 +27,8 @@ const LUCY_CLOUD_URL =
 
 
 function getTime() {
-
-    const now = new Date();
+    const now =
+        new Date();
 
     return now.toLocaleTimeString(
         [],
@@ -33,7 +38,6 @@ function getTime() {
             hour12: false
         }
     );
-
 }
 
 
@@ -41,7 +45,6 @@ function addMessage(
     message,
     type
 ) {
-
     const wrapper =
         document.createElement("div");
 
@@ -69,64 +72,60 @@ function addMessage(
         getTime();
 
 
-    wrapper.appendChild(text);
+    wrapper.appendChild(
+        text
+    );
 
-    wrapper.appendChild(timestamp);
+    wrapper.appendChild(
+        timestamp
+    );
 
-    conversation.appendChild(wrapper);
+    conversation.appendChild(
+        wrapper
+    );
 
     scrollToBottom();
-
 }
 
 
 function scrollToBottom() {
-
     conversation.scrollTop =
         conversation.scrollHeight;
-
 }
 
 
 function setInputEnabled(
     enabled
 ) {
-
     input.disabled =
         !enabled;
 
     sendButton.disabled =
         !enabled;
-
 }
 
 
 function setStatus(
     newStatus
 ) {
-
     status.textContent =
         newStatus;
-
 }
 
 
 function setProcessing(
     active
 ) {
-
     processing.classList.toggle(
         "hidden",
         !active
     );
-
 }
 
 
 function setRingStatus(
     newStatus
 ) {
-
     ring.classList.remove(
         "processing",
         "speaking"
@@ -137,11 +136,9 @@ function setRingStatus(
         newStatus ===
         "PROCESSING"
     ) {
-
         ring.classList.add(
             "processing"
         );
-
     }
 
 
@@ -149,20 +146,16 @@ function setRingStatus(
         newStatus ===
         "SPEAKING"
     ) {
-
         ring.classList.add(
             "speaking"
         );
-
     }
-
 }
 
 
 form.addEventListener(
     "submit",
     async function(event) {
-
         event.preventDefault();
 
 
@@ -175,7 +168,37 @@ form.addEventListener(
         }
 
 
-        setInputEnabled(false);
+        // ----------------------------------
+        // GET LOGIN TOKEN
+        // ----------------------------------
+
+        const token =
+            sessionStorage.getItem(
+                "lucy_token"
+            );
+
+
+        if (!token) {
+            setStatus(
+                "OFFLINE"
+            );
+
+            addMessage(
+                "AUTHENTICATION REQUIRED",
+                "lucy"
+            );
+
+            return;
+        }
+
+
+        // ----------------------------------
+        // USER MESSAGE
+        // ----------------------------------
+
+        setInputEnabled(
+            false
+        );
 
         addMessage(
             message,
@@ -185,6 +208,10 @@ form.addEventListener(
         input.value = "";
 
 
+        // ----------------------------------
+        // PROCESSING
+        // ----------------------------------
+
         setStatus(
             "PROCESSING..."
         );
@@ -193,11 +220,12 @@ form.addEventListener(
             "PROCESSING"
         );
 
-        setProcessing(true);
+        setProcessing(
+            true
+        );
 
 
         try {
-
             const response =
                 await fetch(
                     LUCY_CLOUD_URL,
@@ -212,18 +240,35 @@ form.addEventListener(
                         body: JSON.stringify({
                             message: message,
                             session_id:
-                                SESSION_ID
+                                SESSION_ID,
+                            token: token
                         })
                     }
                 );
 
 
-            if (!response.ok) {
+            // ----------------------------------
+            // AUTH EXPIRED / INVALID
+            // ----------------------------------
 
+            if (
+                response.status === 401
+            ) {
+                sessionStorage.removeItem(
+                    "lucy_token"
+                );
+
+                window.location.href =
+                    "login.html";
+
+                return;
+            }
+
+
+            if (!response.ok) {
                 throw new Error(
                     `HTTP ${response.status}`
                 );
-
             }
 
 
@@ -235,8 +280,13 @@ form.addEventListener(
                 data.response.trim();
 
 
-            setProcessing(false);
+            // ----------------------------------
+            // LUCY RESPONSE
+            // ----------------------------------
 
+            setProcessing(
+                false
+            );
 
             setStatus(
                 "LISTENING"
@@ -254,15 +304,15 @@ form.addEventListener(
 
 
         } catch (error) {
-
             console.error(
                 "Lucy cloud error:",
                 error
             );
 
 
-            setProcessing(false);
-
+            setProcessing(
+                false
+            );
 
             setStatus(
                 "ERROR"
@@ -277,13 +327,13 @@ form.addEventListener(
                 "SYSTEM ERROR",
                 "lucy"
             );
-
         }
 
 
-        setInputEnabled(true);
+        setInputEnabled(
+            true
+        );
 
         input.focus();
-
     }
 );
